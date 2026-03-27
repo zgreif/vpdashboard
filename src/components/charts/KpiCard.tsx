@@ -19,7 +19,7 @@ export function KpiCard({ metric }: KpiCardProps) {
     <Card className="overflow-hidden">
       <CardHeader className="pb-1 pt-4 px-4">
         <div className="flex items-center justify-between gap-2">
-          <p className="text-sm font-semibold text-foreground">
+          <p className="text-base font-semibold text-foreground">
             {metric.title}
           </p>
           {hasYoY && (

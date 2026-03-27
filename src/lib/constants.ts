@@ -1,6 +1,6 @@
 import type { MonthlyRow } from "@/types";
 
-export const APP_NAME = "Fiber KPI";
+export const APP_NAME = "viaPhoton";
 
 export const CHART_COLORS = {
   salesOrders: "#378ADD",

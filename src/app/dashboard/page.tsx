@@ -41,16 +41,10 @@ function ViewModeToggle({
 
 export default function DashboardPage() {
   const { data, metrics, viewMode, setViewMode, updateData, resetData } = useKpiData();
-  const latestMonth = data[data.length - 1]?.month;
-
-  const subtitle = latestMonth
-    ? `As of ${latestMonth} · ${viewMode === "ltm" ? "LTM" : "Monthly"}`
-    : undefined;
 
   return (
     <div className="flex flex-col flex-1">
       <TopNav
-        subtitle={subtitle}
         actions={
           <>
             <ViewModeToggle value={viewMode} onChange={setViewMode} />

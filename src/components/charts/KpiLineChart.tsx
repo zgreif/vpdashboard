@@ -9,12 +9,25 @@ import {
   ResponsiveContainer,
   Tooltip,
   ReferenceLine,
+  LabelList,
 } from "recharts";
 
 /** "Jan 2024" → "Jan'24" */
 function formatMonthLabel(month: string): string {
   const parts = month.split(" ");
   return `${parts[0]}'${(parts[1] ?? "").slice(2)}`;
+}
+
+/** Label above each data point — 1 decimal */
+function formatPointLabel(value: number, unit: "currency" | "percent"): string {
+  if (unit === "percent") return `${value.toFixed(1)}%`;
+  return `$${value.toFixed(1)}`;
+}
+
+/** Y-axis tick — no decimals */
+function formatAxisTick(v: number, unit: "currency" | "percent"): string {
+  if (unit === "percent") return `${Math.round(v)}%`;
+  return `$${Math.round(v)}`;
 }
 
 function formatTooltip(value: number, unit: "currency" | "percent"): string {
@@ -64,23 +77,23 @@ export function KpiLineChart({ data, color, unit }: KpiLineChartProps) {
       : 0;
 
   return (
-    <ResponsiveContainer width="100%" height={180}>
+    <ResponsiveContainer width="100%" height={190}>
       <LineChart
         data={formatted}
-        margin={{ top: 16, right: 8, left: 4, bottom: 0 }}
+        margin={{ top: 30, right: 8, left: 4, bottom: 0 }}
       >
         <XAxis
           dataKey="monthLabel"
-          tick={{ fontSize: 9, fill: "var(--muted-foreground)" }}
+          tick={{ fontSize: 9, fill: "var(--foreground)" }}
           tickLine={false}
           axisLine={false}
           interval="preserveStartEnd"
         />
         <YAxis
-          tick={{ fontSize: 9, fill: "var(--muted-foreground)" }}
+          tick={{ fontSize: 9, fill: "var(--foreground)" }}
           tickLine={false}
           axisLine={false}
-          tickFormatter={(v: number) => (unit === "percent" ? `${v}%` : `$${v}`)}
+          tickFormatter={(v: number) => formatAxisTick(v, unit)}
           width={44}
         />
         <Tooltip
@@ -100,7 +113,14 @@ export function KpiLineChart({ data, color, unit }: KpiLineChartProps) {
           strokeWidth={2.5}
           dot={{ fill: color, r: 3, strokeWidth: 0 }}
           activeDot={{ r: 5, strokeWidth: 0 }}
-        />
+        >
+          <LabelList
+            dataKey="value"
+            position="top"
+            formatter={(v: unknown) => formatPointLabel(Number(v ?? 0), unit)}
+            style={{ fontSize: 12, fill: "var(--foreground)", fontWeight: 600 }}
+          />
+        </Line>
       </LineChart>
     </ResponsiveContainer>
   );

@@ -39,15 +39,10 @@ export function TopNav({ actions, subtitle }: TopNavProps) {
         <div className="flex items-center gap-3 pr-5 shrink-0">
           <Link href="/dashboard" className="flex items-center gap-2 font-bold text-[15px] text-foreground">
             <div className="h-7 w-7 rounded-md bg-primary flex items-center justify-center shrink-0">
-              <span className="text-primary-foreground text-xs font-bold">F</span>
+              <span className="text-primary-foreground text-[10px] font-bold tracking-tight">vP</span>
             </div>
             <span className="hidden sm:inline">{APP_NAME}</span>
           </Link>
-          {subtitle && (
-            <span className="hidden lg:block text-xs text-muted-foreground border-l pl-3">
-              {subtitle}
-            </span>
-          )}
         </div>
 
         {/* ── Tabs ── full-height links with underline active state */}
