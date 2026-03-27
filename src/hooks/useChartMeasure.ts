@@ -26,7 +26,7 @@ export function useChartMeasure() {
     containerRef,
     // Labels above bars / data points: 10–16px
     labelFontSize: Math.max(10, Math.min(16, Math.round(width * 0.024))),
-    // X-axis tick labels: 8–12px
-    tickFontSize: Math.max(8, Math.min(12, Math.round(width * 0.016))),
+    // X-axis tick labels: 10–14px
+    tickFontSize: Math.max(10, Math.min(14, Math.round(width * 0.021))),
   };
 }
