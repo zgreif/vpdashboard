@@ -23,12 +23,6 @@ function formatBarLabel(value: number, unit: "currency" | "percent"): string {
   return `$${value.toFixed(1)}`;
 }
 
-/** Y-axis tick — no decimals */
-function formatAxisTick(v: number, unit: "currency" | "percent"): string {
-  if (unit === "percent") return `${Math.round(v)}%`;
-  return `$${Math.round(v)}`;
-}
-
 /** Full value shown in tooltip */
 function formatTooltip(value: number, unit: "currency" | "percent"): string {
   if (unit === "percent") return `${value.toFixed(1)}%`;
@@ -75,7 +69,7 @@ export function KpiBarChart({ data, color, unit }: KpiBarChartProps) {
     <ResponsiveContainer width="100%" height={190}>
       <BarChart
         data={formatted}
-        margin={{ top: 30, right: 8, left: 4, bottom: 0 }}
+        margin={{ top: 30, right: 8, left: 0, bottom: 0 }}
         barCategoryGap="6%"
       >
         <XAxis
@@ -85,13 +79,7 @@ export function KpiBarChart({ data, color, unit }: KpiBarChartProps) {
           axisLine={false}
           interval="preserveStartEnd"
         />
-        <YAxis
-          tick={{ fontSize: 9, fill: "var(--foreground)" }}
-          tickLine={false}
-          axisLine={false}
-          tickFormatter={(v: number) => formatAxisTick(v, unit)}
-          width={44}
-        />
+        <YAxis hide />
         <Tooltip
           content={<CustomTooltip unit={unit} />}
           cursor={{ fill: "rgba(128,128,128,0.08)" }}

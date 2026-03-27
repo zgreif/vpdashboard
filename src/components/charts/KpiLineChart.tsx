@@ -65,51 +65,61 @@ export function KpiLineChart({ data, color, unit }: KpiLineChartProps) {
     monthLabel: formatMonthLabel(d.month),
   }));
 
+  const values = formatted.map((d) => d.value);
+  const dataMin = values.length > 0 ? Math.min(...values) : 0;
+  const dataMax = values.length > 0 ? Math.max(...values) : 1;
+  // Pad by 30% of the data range so the line always has visible slope
+  const range = dataMax - dataMin;
+  const pad = Math.max(range * 0.3, dataMax * 0.04);
+  const yDomain: [number, number] = [Math.max(0, dataMin - pad), dataMax + pad];
+
   const avg =
-    formatted.length > 0
-      ? formatted.reduce((s, d) => s + d.value, 0) / formatted.length
-      : 0;
+    values.length > 0 ? values.reduce((s, v) => s + v, 0) / values.length : 0;
 
   return (
-    <ResponsiveContainer width="100%" height={190}>
-      <LineChart
-        data={formatted}
-        margin={{ top: 30, right: 8, left: 8, bottom: 0 }}
-      >
-        <XAxis
-          dataKey="monthLabel"
-          tick={{ fontSize: 9, fill: "var(--foreground)" }}
-          tickLine={false}
-          axisLine={false}
-          interval="preserveStartEnd"
-        />
-        <YAxis hide />
-        <Tooltip
-          content={<CustomTooltip unit={unit} />}
-          cursor={{ stroke: "rgba(128,128,128,0.2)", strokeWidth: 1 }}
-        />
-        <ReferenceLine
-          y={avg}
-          stroke="rgba(128,128,128,0.25)"
-          strokeDasharray="4 3"
-          strokeWidth={1}
-        />
-        <Line
-          type="monotone"
-          dataKey="value"
-          stroke={color}
-          strokeWidth={2.5}
-          dot={{ fill: color, r: 3, strokeWidth: 0 }}
-          activeDot={{ r: 5, strokeWidth: 0 }}
+    // overflow-visible lets labels at the left/right edges render without clipping
+    <div style={{ overflow: "visible" }}>
+      <ResponsiveContainer width="100%" height={190}>
+        <LineChart
+          data={formatted}
+          margin={{ top: 30, right: 22, left: 22, bottom: 0 }}
         >
-          <LabelList
-            dataKey="value"
-            position="top"
-            formatter={(v: unknown) => formatPointLabel(Number(v ?? 0), unit)}
-            style={{ fontSize: 12, fill: "var(--foreground)", fontWeight: 600 }}
+          <XAxis
+            dataKey="monthLabel"
+            tick={{ fontSize: 9, fill: "var(--foreground)" }}
+            tickLine={false}
+            axisLine={false}
+            interval="preserveStartEnd"
           />
-        </Line>
-      </LineChart>
-    </ResponsiveContainer>
+          {/* Hidden Y axis — domain set so the line has visible variation */}
+          <YAxis hide domain={yDomain} />
+          <Tooltip
+            content={<CustomTooltip unit={unit} />}
+            cursor={{ stroke: "rgba(128,128,128,0.2)", strokeWidth: 1 }}
+          />
+          <ReferenceLine
+            y={avg}
+            stroke="rgba(128,128,128,0.25)"
+            strokeDasharray="4 3"
+            strokeWidth={1}
+          />
+          <Line
+            type="monotone"
+            dataKey="value"
+            stroke={color}
+            strokeWidth={2.5}
+            dot={{ fill: color, r: 3, strokeWidth: 0 }}
+            activeDot={{ r: 5, strokeWidth: 0 }}
+          >
+            <LabelList
+              dataKey="value"
+              position="top"
+              formatter={(v: unknown) => formatPointLabel(Number(v ?? 0), unit)}
+              style={{ fontSize: 12, fill: "var(--foreground)", fontWeight: 600 }}
+            />
+          </Line>
+        </LineChart>
+      </ResponsiveContainer>
+    </div>
   );
 }
