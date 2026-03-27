@@ -14,11 +14,11 @@ import {
 import {
   CHART_ASPECT,
   CHART_MIN_HEIGHT,
+  CHART_MAX_HEIGHT,
   CHART_MARGIN,
-  LABEL_STYLE,
-  AXIS_TICK_STYLE,
   formatMonthLabel,
 } from "@/lib/chartConfig";
+import { useChartMeasure } from "@/hooks/useChartMeasure";
 
 function formatPointLabel(value: number, unit: "currency" | "percent"): string {
   if (unit === "percent") return `${Math.round(value)}%`;
@@ -56,6 +56,7 @@ interface KpiLineChartProps {
 }
 
 export function KpiLineChart({ data, color, unit }: KpiLineChartProps) {
+  const { containerRef, labelFontSize, tickFontSize } = useChartMeasure();
   const formatted = data.map((d) => ({ ...d, monthLabel: formatMonthLabel(d.month) }));
 
   const values = formatted.map((d) => d.value);
@@ -64,16 +65,25 @@ export function KpiLineChart({ data, color, unit }: KpiLineChartProps) {
   const range = dataMax - dataMin;
   const pad = Math.max(range * 0.3, dataMax * 0.04);
   const yDomain: [number, number] = [Math.max(0, dataMin - pad), dataMax + pad];
-
   const avg = values.length > 0 ? values.reduce((s, v) => s + v, 0) / values.length : 0;
 
   return (
-    <div style={{ overflow: "visible" }}>
-      <ResponsiveContainer width="100%" aspect={CHART_ASPECT} minHeight={CHART_MIN_HEIGHT}>
+    // overflow: visible lets labels at the edges render without clipping
+    <div
+      ref={containerRef}
+      style={{
+        aspectRatio: String(CHART_ASPECT),
+        maxHeight: `${CHART_MAX_HEIGHT}px`,
+        minHeight: `${CHART_MIN_HEIGHT}px`,
+        width: "100%",
+        overflow: "visible",
+      }}
+    >
+      <ResponsiveContainer width="100%" height="100%">
         <LineChart data={formatted} margin={CHART_MARGIN}>
           <XAxis
             dataKey="monthLabel"
-            tick={AXIS_TICK_STYLE}
+            tick={{ fontSize: tickFontSize, fill: "var(--foreground)" }}
             tickLine={false}
             axisLine={false}
             interval="preserveStartEnd"
@@ -101,7 +111,7 @@ export function KpiLineChart({ data, color, unit }: KpiLineChartProps) {
               dataKey="value"
               position="top"
               formatter={(v: unknown) => formatPointLabel(Number(v ?? 0), unit)}
-              style={LABEL_STYLE}
+              style={{ fontSize: labelFontSize, fill: "var(--foreground)", fontWeight: 600 }}
             />
           </Line>
         </LineChart>

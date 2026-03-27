@@ -16,11 +16,12 @@ import { CUSTOMER_COLORS } from "@/lib/constants";
 import {
   CHART_ASPECT,
   CHART_MIN_HEIGHT,
+  CHART_MAX_HEIGHT,
   BAR_CHART_MARGIN,
-  AXIS_TICK_STYLE,
   BAR_CATEGORY_GAP,
   formatMonthLabel,
 } from "@/lib/chartConfig";
+import { useChartMeasure } from "@/hooks/useChartMeasure";
 import type { CustomerRow } from "@/types";
 import type { ViewMode } from "@/lib/calculations";
 
@@ -131,6 +132,7 @@ interface CustomerBarChartProps {
 
 export function CustomerBarChart({ data, metric, mode, title }: CustomerBarChartProps) {
   const { ref, download } = useChartDownload(title);
+  const { containerRef, tickFontSize } = useChartMeasure();
 
   const customers = Array.from(new Set(data.map((r) => r.customer))).sort();
   const pivotData = buildPivotData(data, metric, mode, customers);
@@ -162,31 +164,41 @@ export function CustomerBarChart({ data, metric, mode, title }: CustomerBarChart
         </div>
       </CardHeader>
       <CardContent className="pb-4 px-2 pt-1">
-        <ResponsiveContainer width="100%" aspect={CHART_ASPECT} minHeight={CHART_MIN_HEIGHT}>
-          <BarChart data={pivotData} margin={BAR_CHART_MARGIN} barCategoryGap={BAR_CATEGORY_GAP}>
-            <XAxis
-              dataKey="monthLabel"
-              tick={AXIS_TICK_STYLE}
-              tickLine={false}
-              axisLine={false}
-              interval="preserveStartEnd"
-            />
-            <YAxis hide />
-            <Tooltip
-              content={<CustomerTooltip />}
-              cursor={{ fill: "rgba(128,128,128,0.08)" }}
-            />
-            {customers.map((customer, i) => (
-              <Bar
-                key={customer}
-                dataKey={customer}
-                stackId="customers"
-                fill={CUSTOMER_COLORS[i % CUSTOMER_COLORS.length]}
-                radius={i === customers.length - 1 ? [3, 3, 0, 0] : [0, 0, 0, 0]}
+        <div
+          ref={containerRef}
+          style={{
+            aspectRatio: String(CHART_ASPECT),
+            maxHeight: `${CHART_MAX_HEIGHT}px`,
+            minHeight: `${CHART_MIN_HEIGHT}px`,
+            width: "100%",
+          }}
+        >
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={pivotData} margin={BAR_CHART_MARGIN} barCategoryGap={BAR_CATEGORY_GAP}>
+              <XAxis
+                dataKey="monthLabel"
+                tick={{ fontSize: tickFontSize, fill: "var(--foreground)" }}
+                tickLine={false}
+                axisLine={false}
+                interval="preserveStartEnd"
               />
-            ))}
-          </BarChart>
-        </ResponsiveContainer>
+              <YAxis hide />
+              <Tooltip
+                content={<CustomerTooltip />}
+                cursor={{ fill: "rgba(128,128,128,0.08)" }}
+              />
+              {customers.map((customer, i) => (
+                <Bar
+                  key={customer}
+                  dataKey={customer}
+                  stackId="customers"
+                  fill={CUSTOMER_COLORS[i % CUSTOMER_COLORS.length]}
+                  radius={i === customers.length - 1 ? [3, 3, 0, 0] : [0, 0, 0, 0]}
+                />
+              ))}
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
       </CardContent>
     </Card>
   );

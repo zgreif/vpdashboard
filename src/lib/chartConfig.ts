@@ -5,8 +5,9 @@
 
 /** width ÷ height ratio — maintained as the card resizes */
 export const CHART_ASPECT = 2.5;
-/** Minimum chart height so it doesn't get too short on narrow screens */
+/** Chart height is clamped between these values regardless of card width */
 export const CHART_MIN_HEIGHT = 150;
+export const CHART_MAX_HEIGHT = 380;
 
 export const CHART_MARGIN = {
   top: 30,
