@@ -1,6 +1,8 @@
 import type { MonthlyRow, KpiMetric } from "@/types";
 import { METRIC_CONFIG } from "./constants";
 
+export type ViewMode = "ltm" | "monthly";
+
 /** Rolling 12-month sum for each data point. */
 export function calcLtmSeries(
   data: MonthlyRow[],
@@ -14,7 +16,7 @@ export function calcLtmSeries(
   });
 }
 
-/** Rolling 12-month margin % (numerator / denominator * 100) for each data point. */
+/** Rolling 12-month margin % for each data point. */
 export function calcMarginSeries(
   data: MonthlyRow[],
   numeratorKey: keyof MonthlyRow,
@@ -30,6 +32,33 @@ export function calcMarginSeries(
   });
 }
 
+/** Raw monthly values (no rolling). */
+function calcMonthlySeries(
+  data: MonthlyRow[],
+  key: keyof MonthlyRow
+): { month: string; value: number }[] {
+  return data.map((row) => ({
+    month: row.month,
+    value: Math.round((row[key] as number) * 100) / 100,
+  }));
+}
+
+/** Raw monthly margin % — numerator/denominator per individual month. */
+function calcMonthlyMarginSeries(
+  data: MonthlyRow[],
+  numeratorKey: keyof MonthlyRow,
+  denominatorKey: keyof MonthlyRow
+): { month: string; value: number }[] {
+  return data.map((row) => {
+    const num = row[numeratorKey] as number;
+    const den = row[denominatorKey] as number;
+    return {
+      month: row.month,
+      value: den !== 0 ? Math.round((num / den) * 1000) / 10 : 0,
+    };
+  });
+}
+
 /** YoY % change: latest month vs same month 12 periods prior. Returns 0 if data < 13 rows. */
 export function calcYoY(data: MonthlyRow[], key: keyof MonthlyRow): number {
   if (data.length < 13) return 0;
@@ -39,8 +68,8 @@ export function calcYoY(data: MonthlyRow[], key: keyof MonthlyRow): number {
   return Math.round(((latest - priorYear) / priorYear) * 1000) / 10;
 }
 
-/** Build all KpiMetric objects from the raw data, driven by METRIC_CONFIG. */
-export function buildAllKpis(data: MonthlyRow[]): KpiMetric[] {
+/** Build all KpiMetric objects. mode switches between LTM (rolling 12-month) and raw monthly. */
+export function buildAllKpis(data: MonthlyRow[], mode: ViewMode = "ltm"): KpiMetric[] {
   if (data.length === 0) return [];
 
   return METRIC_CONFIG.map((config) => {
@@ -49,7 +78,10 @@ export function buildAllKpis(data: MonthlyRow[]): KpiMetric[] {
     let yoyChange: number;
 
     if (config.calcType === "ltm" && config.key) {
-      const series = calcLtmSeries(data, config.key);
+      const series =
+        mode === "ltm"
+          ? calcLtmSeries(data, config.key)
+          : calcMonthlySeries(data, config.key);
       chartData = series;
       value = series[series.length - 1]?.value ?? 0;
       yoyChange = calcYoY(data, config.key);
@@ -58,18 +90,20 @@ export function buildAllKpis(data: MonthlyRow[]): KpiMetric[] {
       config.numeratorKey &&
       config.denominatorKey
     ) {
-      const series = calcMarginSeries(data, config.numeratorKey, config.denominatorKey);
+      const series =
+        mode === "ltm"
+          ? calcMarginSeries(data, config.numeratorKey, config.denominatorKey)
+          : calcMonthlyMarginSeries(data, config.numeratorKey, config.denominatorKey);
       chartData = series;
       value = series[series.length - 1]?.value ?? 0;
 
-      // YoY for margin: compare latest LTM margin vs LTM margin 12 months prior
+      // YoY: compare latest LTM/monthly margin vs 12 months prior
       if (data.length >= 13) {
         const priorData = data.slice(0, data.length - 12);
-        const priorSeries = calcMarginSeries(
-          priorData,
-          config.numeratorKey,
-          config.denominatorKey
-        );
+        const priorSeries =
+          mode === "ltm"
+            ? calcMarginSeries(priorData, config.numeratorKey, config.denominatorKey)
+            : calcMonthlyMarginSeries(priorData, config.numeratorKey, config.denominatorKey);
         const priorValue = priorSeries[priorSeries.length - 1]?.value ?? 0;
         yoyChange =
           priorValue !== 0
@@ -89,6 +123,7 @@ export function buildAllKpis(data: MonthlyRow[]): KpiMetric[] {
       title: config.title,
       value,
       unit: config.unit,
+      chartType: config.chartType,
       yoyChange,
       chartData,
       color: config.color,

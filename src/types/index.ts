@@ -11,6 +11,7 @@ export interface KpiMetric {
   title: string;
   value: number;
   unit: "currency" | "percent";
+  chartType: "bar" | "line";
   yoyChange: number;
   chartData: { month: string; value: number }[];
   color: string;

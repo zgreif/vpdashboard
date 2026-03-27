@@ -18,6 +18,7 @@ export interface MetricConfig {
   title: string;
   color: string;
   unit: "currency" | "percent";
+  chartType: "bar" | "line";
   calcType: MetricCalcType;
   key?: keyof MonthlyRow;
   numeratorKey?: keyof MonthlyRow;
@@ -34,6 +35,7 @@ export const METRIC_CONFIG: MetricConfig[] = [
     title: "Sales Orders",
     color: CHART_COLORS.salesOrders,
     unit: "currency",
+    chartType: "bar",
     calcType: "ltm",
     key: "salesOrders",
   },
@@ -42,6 +44,7 @@ export const METRIC_CONFIG: MetricConfig[] = [
     title: "Revenue",
     color: CHART_COLORS.revenue,
     unit: "currency",
+    chartType: "bar",
     calcType: "ltm",
     key: "revenue",
   },
@@ -50,6 +53,7 @@ export const METRIC_CONFIG: MetricConfig[] = [
     title: "Gross Profit",
     color: CHART_COLORS.grossProfit,
     unit: "currency",
+    chartType: "bar",
     calcType: "ltm",
     key: "grossProfit",
   },
@@ -58,6 +62,7 @@ export const METRIC_CONFIG: MetricConfig[] = [
     title: "EBITDA",
     color: CHART_COLORS.ebitda,
     unit: "currency",
+    chartType: "bar",
     calcType: "ltm",
     key: "ebitda",
   },
@@ -66,6 +71,7 @@ export const METRIC_CONFIG: MetricConfig[] = [
     title: "Gross Margin",
     color: CHART_COLORS.grossMargin,
     unit: "percent",
+    chartType: "line",
     calcType: "margin",
     numeratorKey: "grossProfit",
     denominatorKey: "revenue",
@@ -75,6 +81,7 @@ export const METRIC_CONFIG: MetricConfig[] = [
     title: "EBITDA Margin",
     color: CHART_COLORS.ebitdaMargin,
     unit: "percent",
+    chartType: "line",
     calcType: "margin",
     numeratorKey: "ebitda",
     denominatorKey: "revenue",

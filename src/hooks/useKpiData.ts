@@ -3,11 +3,13 @@
 import { useState, useEffect, useCallback } from "react";
 import type { MonthlyRow, KpiMetric } from "@/types";
 import { SAMPLE_DATA, loadFromStorage, saveToStorage } from "@/lib/data";
-import { buildAllKpis } from "@/lib/calculations";
+import { buildAllKpis, type ViewMode } from "@/lib/calculations";
 
 interface UseKpiDataReturn {
   data: MonthlyRow[];
   metrics: KpiMetric[];
+  viewMode: ViewMode;
+  setViewMode: (mode: ViewMode) => void;
   updateData: (rows: MonthlyRow[]) => void;
   resetData: () => void;
 }
@@ -18,6 +20,7 @@ interface UseKpiDataReturn {
  */
 export function useKpiData(): UseKpiDataReturn {
   const [data, setData] = useState<MonthlyRow[]>(SAMPLE_DATA);
+  const [viewMode, setViewMode] = useState<ViewMode>("ltm");
 
   useEffect(() => {
     const stored = loadFromStorage();
@@ -26,7 +29,7 @@ export function useKpiData(): UseKpiDataReturn {
     }
   }, []);
 
-  const metrics = buildAllKpis(data);
+  const metrics = buildAllKpis(data, viewMode);
 
   const updateData = useCallback((rows: MonthlyRow[]) => {
     setData(rows);
@@ -38,5 +41,5 @@ export function useKpiData(): UseKpiDataReturn {
     saveToStorage(SAMPLE_DATA);
   }, []);
 
-  return { data, metrics, updateData, resetData };
+  return { data, metrics, viewMode, setViewMode, updateData, resetData };
 }

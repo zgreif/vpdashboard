@@ -2,13 +2,13 @@
 
 import * as React from "react";
 import {
-  BarChart,
-  Bar,
+  LineChart,
+  Line,
   XAxis,
   YAxis,
   ResponsiveContainer,
   Tooltip,
-  LabelList,
+  ReferenceLine,
 } from "recharts";
 
 /** "Jan 2024" → "Jan'24" */
@@ -17,13 +17,6 @@ function formatMonthLabel(month: string): string {
   return `${parts[0]}'${(parts[1] ?? "").slice(2)}`;
 }
 
-/** Label above each bar — compact (no M suffix to save space) */
-function formatBarLabel(value: number, unit: "currency" | "percent"): string {
-  if (unit === "percent") return `${value.toFixed(1)}%`;
-  return `$${value.toFixed(1)}`;
-}
-
-/** Full value shown in tooltip */
 function formatTooltip(value: number, unit: "currency" | "percent"): string {
   if (unit === "percent") return `${value.toFixed(1)}%`;
   return `$${value.toFixed(1)}M`;
@@ -53,24 +46,28 @@ function CustomTooltip({
   );
 }
 
-interface KpiBarChartProps {
+interface KpiLineChartProps {
   data: { month: string; value: number }[];
   color: string;
   unit: "currency" | "percent";
 }
 
-export function KpiBarChart({ data, color, unit }: KpiBarChartProps) {
+export function KpiLineChart({ data, color, unit }: KpiLineChartProps) {
   const formatted = data.map((d) => ({
     ...d,
     monthLabel: formatMonthLabel(d.month),
   }));
 
+  const avg =
+    formatted.length > 0
+      ? formatted.reduce((s, d) => s + d.value, 0) / formatted.length
+      : 0;
+
   return (
     <ResponsiveContainer width="100%" height={180}>
-      <BarChart
+      <LineChart
         data={formatted}
-        margin={{ top: 26, right: 8, left: 4, bottom: 0 }}
-        barCategoryGap="6%"
+        margin={{ top: 16, right: 8, left: 4, bottom: 0 }}
       >
         <XAxis
           dataKey="monthLabel"
@@ -88,17 +85,23 @@ export function KpiBarChart({ data, color, unit }: KpiBarChartProps) {
         />
         <Tooltip
           content={<CustomTooltip unit={unit} />}
-          cursor={{ fill: "rgba(128,128,128,0.08)" }}
+          cursor={{ stroke: "rgba(128,128,128,0.2)", strokeWidth: 1 }}
         />
-        <Bar dataKey="value" fill={color} radius={[3, 3, 0, 0]}>
-          <LabelList
-            dataKey="value"
-            position="top"
-            formatter={(v: unknown) => formatBarLabel(Number(v ?? 0), unit)}
-            style={{ fontSize: 10, fill: "var(--foreground)", fontWeight: 600 }}
-          />
-        </Bar>
-      </BarChart>
+        <ReferenceLine
+          y={avg}
+          stroke="rgba(128,128,128,0.25)"
+          strokeDasharray="4 3"
+          strokeWidth={1}
+        />
+        <Line
+          type="monotone"
+          dataKey="value"
+          stroke={color}
+          strokeWidth={2.5}
+          dot={{ fill: color, r: 3, strokeWidth: 0 }}
+          activeDot={{ r: 5, strokeWidth: 0 }}
+        />
+      </LineChart>
     </ResponsiveContainer>
   );
 }
