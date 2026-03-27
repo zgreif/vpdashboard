@@ -145,13 +145,21 @@ function marginYoY(
   denKey: keyof MonthlyRow,
   mode: ViewMode
 ): number {
-  if (data.length < 13) return 0;
-  const priorData = data.slice(0, data.length - 12);
-  const buildFn = mode === "ltm" ? ltmMarginSeries : monthlyMarginSeries;
-  const currentSeries = buildFn(data, numKey, denKey);
-  const priorSeries = buildFn(priorData, numKey, denKey);
-  const current = currentSeries[currentSeries.length - 1]?.value ?? 0;
-  const prior = priorSeries[priorSeries.length - 1]?.value ?? 0;
+  // Build the same series that the chart uses, then look back within it.
+  const series =
+    mode === "ltm"
+      ? ltmMarginSeries(data, numKey, denKey)
+      : mode === "quarterly"
+      ? quarterlyMarginSeries(data, numKey, denKey)
+      : monthlyMarginSeries(data, numKey, denKey);
+
+  // Quarterly: same quarter prior year = 4 periods back.
+  // Monthly / LTM: same month prior year = 12 periods back.
+  const lookback = mode === "quarterly" ? 4 : 12;
+  if (series.length <= lookback) return 0;
+
+  const current = series[series.length - 1]?.value ?? 0;
+  const prior   = series[series.length - 1 - lookback]?.value ?? 0;
   if (prior === 0) return 0;
   return Math.round(((current - prior) / prior) * 1000) / 10;
 }
