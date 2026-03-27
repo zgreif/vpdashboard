@@ -10,34 +10,30 @@ import {
   Tooltip,
   LabelList,
 } from "recharts";
+import {
+  CHART_HEIGHT,
+  BAR_CHART_MARGIN,
+  LABEL_STYLE,
+  AXIS_TICK_STYLE,
+  BAR_CATEGORY_GAP,
+  BAR_RADIUS,
+  formatMonthLabel,
+} from "@/lib/chartConfig";
 
-/** "Jan 2024" → "Jan'24" */
-function formatMonthLabel(month: string): string {
-  const parts = month.split(" ");
-  return `${parts[0]}'${(parts[1] ?? "").slice(2)}`;
-}
-
-/** Label above each bar — 1 decimal, no M suffix */
 function formatBarLabel(value: number, unit: "currency" | "percent"): string {
   if (unit === "percent") return `${value.toFixed(1)}%`;
   return `$${value.toFixed(1)}`;
 }
 
-/** Full value shown in tooltip */
 function formatTooltip(value: number, unit: "currency" | "percent"): string {
   if (unit === "percent") return `${value.toFixed(1)}%`;
   return `$${value.toFixed(1)}M`;
 }
 
-interface TooltipEntry {
-  value?: number;
-}
+interface TooltipEntry { value?: number }
 
 function CustomTooltip({
-  active,
-  payload,
-  label,
-  unit,
+  active, payload, label, unit,
 }: {
   active?: boolean;
   payload?: TooltipEntry[];
@@ -60,36 +56,26 @@ interface KpiBarChartProps {
 }
 
 export function KpiBarChart({ data, color, unit }: KpiBarChartProps) {
-  const formatted = data.map((d) => ({
-    ...d,
-    monthLabel: formatMonthLabel(d.month),
-  }));
+  const formatted = data.map((d) => ({ ...d, monthLabel: formatMonthLabel(d.month) }));
 
   return (
-    <ResponsiveContainer width="100%" height={190}>
-      <BarChart
-        data={formatted}
-        margin={{ top: 30, right: 8, left: 0, bottom: 0 }}
-        barCategoryGap="6%"
-      >
+    <ResponsiveContainer width="100%" height={CHART_HEIGHT}>
+      <BarChart data={formatted} margin={BAR_CHART_MARGIN} barCategoryGap={BAR_CATEGORY_GAP}>
         <XAxis
           dataKey="monthLabel"
-          tick={{ fontSize: 9, fill: "var(--foreground)" }}
+          tick={AXIS_TICK_STYLE}
           tickLine={false}
           axisLine={false}
           interval="preserveStartEnd"
         />
         <YAxis hide />
-        <Tooltip
-          content={<CustomTooltip unit={unit} />}
-          cursor={{ fill: "rgba(128,128,128,0.08)" }}
-        />
-        <Bar dataKey="value" fill={color} radius={[3, 3, 0, 0]}>
+        <Tooltip content={<CustomTooltip unit={unit} />} cursor={{ fill: "rgba(128,128,128,0.08)" }} />
+        <Bar dataKey="value" fill={color} radius={BAR_RADIUS}>
           <LabelList
             dataKey="value"
             position="top"
             formatter={(v: unknown) => formatBarLabel(Number(v ?? 0), unit)}
-            style={{ fontSize: 12, fill: "var(--foreground)", fontWeight: 600 }}
+            style={LABEL_STYLE}
           />
         </Bar>
       </BarChart>

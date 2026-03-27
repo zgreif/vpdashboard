@@ -11,14 +11,14 @@ import {
   ReferenceLine,
   LabelList,
 } from "recharts";
+import {
+  CHART_HEIGHT,
+  CHART_MARGIN,
+  LABEL_STYLE,
+  AXIS_TICK_STYLE,
+  formatMonthLabel,
+} from "@/lib/chartConfig";
 
-/** "Jan 2024" → "Jan'24" */
-function formatMonthLabel(month: string): string {
-  const parts = month.split(" ");
-  return `${parts[0]}'${(parts[1] ?? "").slice(2)}`;
-}
-
-/** Label above each data point — no decimals */
 function formatPointLabel(value: number, unit: "currency" | "percent"): string {
   if (unit === "percent") return `${Math.round(value)}%`;
   return `$${Math.round(value)}`;
@@ -29,15 +29,10 @@ function formatTooltip(value: number, unit: "currency" | "percent"): string {
   return `$${value.toFixed(1)}M`;
 }
 
-interface TooltipEntry {
-  value?: number;
-}
+interface TooltipEntry { value?: number }
 
 function CustomTooltip({
-  active,
-  payload,
-  label,
-  unit,
+  active, payload, label, unit,
 }: {
   active?: boolean;
   payload?: TooltipEntry[];
@@ -60,38 +55,28 @@ interface KpiLineChartProps {
 }
 
 export function KpiLineChart({ data, color, unit }: KpiLineChartProps) {
-  const formatted = data.map((d) => ({
-    ...d,
-    monthLabel: formatMonthLabel(d.month),
-  }));
+  const formatted = data.map((d) => ({ ...d, monthLabel: formatMonthLabel(d.month) }));
 
   const values = formatted.map((d) => d.value);
   const dataMin = values.length > 0 ? Math.min(...values) : 0;
   const dataMax = values.length > 0 ? Math.max(...values) : 1;
-  // Pad by 30% of the data range so the line always has visible slope
   const range = dataMax - dataMin;
   const pad = Math.max(range * 0.3, dataMax * 0.04);
   const yDomain: [number, number] = [Math.max(0, dataMin - pad), dataMax + pad];
 
-  const avg =
-    values.length > 0 ? values.reduce((s, v) => s + v, 0) / values.length : 0;
+  const avg = values.length > 0 ? values.reduce((s, v) => s + v, 0) / values.length : 0;
 
   return (
-    // overflow-visible lets labels at the left/right edges render without clipping
     <div style={{ overflow: "visible" }}>
-      <ResponsiveContainer width="100%" height={190}>
-        <LineChart
-          data={formatted}
-          margin={{ top: 30, right: 22, left: 22, bottom: 0 }}
-        >
+      <ResponsiveContainer width="100%" height={CHART_HEIGHT}>
+        <LineChart data={formatted} margin={CHART_MARGIN}>
           <XAxis
             dataKey="monthLabel"
-            tick={{ fontSize: 9, fill: "var(--foreground)" }}
+            tick={AXIS_TICK_STYLE}
             tickLine={false}
             axisLine={false}
             interval="preserveStartEnd"
           />
-          {/* Hidden Y axis — domain set so the line has visible variation */}
           <YAxis hide domain={yDomain} />
           <Tooltip
             content={<CustomTooltip unit={unit} />}
@@ -115,7 +100,7 @@ export function KpiLineChart({ data, color, unit }: KpiLineChartProps) {
               dataKey="value"
               position="top"
               formatter={(v: unknown) => formatPointLabel(Number(v ?? 0), unit)}
-              style={{ fontSize: 12, fill: "var(--foreground)", fontWeight: 600 }}
+              style={LABEL_STYLE}
             />
           </Line>
         </LineChart>

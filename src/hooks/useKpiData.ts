@@ -17,6 +17,7 @@ interface UseKpiDataReturn {
 /**
  * Central data hook — single source of truth for all pages.
  * Loads from localStorage on mount, falls back to sample data.
+ * buildAllKpis returns metrics for every tab; components filter by metric.tab.
  */
 export function useKpiData(): UseKpiDataReturn {
   const [data, setData] = useState<MonthlyRow[]>(SAMPLE_DATA);
@@ -24,9 +25,7 @@ export function useKpiData(): UseKpiDataReturn {
 
   useEffect(() => {
     const stored = loadFromStorage();
-    if (stored && stored.length > 0) {
-      setData(stored);
-    }
+    if (stored && stored.length > 0) setData(stored);
   }, []);
 
   const metrics = buildAllKpis(data, viewMode);
