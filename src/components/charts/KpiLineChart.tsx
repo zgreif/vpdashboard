@@ -18,16 +18,10 @@ function formatMonthLabel(month: string): string {
   return `${parts[0]}'${(parts[1] ?? "").slice(2)}`;
 }
 
-/** Label above each data point — 1 decimal */
+/** Label above each data point — no decimals */
 function formatPointLabel(value: number, unit: "currency" | "percent"): string {
-  if (unit === "percent") return `${value.toFixed(1)}%`;
-  return `$${value.toFixed(1)}`;
-}
-
-/** Y-axis tick — no decimals */
-function formatAxisTick(v: number, unit: "currency" | "percent"): string {
-  if (unit === "percent") return `${Math.round(v)}%`;
-  return `$${Math.round(v)}`;
+  if (unit === "percent") return `${Math.round(value)}%`;
+  return `$${Math.round(value)}`;
 }
 
 function formatTooltip(value: number, unit: "currency" | "percent"): string {
@@ -80,7 +74,7 @@ export function KpiLineChart({ data, color, unit }: KpiLineChartProps) {
     <ResponsiveContainer width="100%" height={190}>
       <LineChart
         data={formatted}
-        margin={{ top: 30, right: 8, left: 4, bottom: 0 }}
+        margin={{ top: 30, right: 8, left: 8, bottom: 0 }}
       >
         <XAxis
           dataKey="monthLabel"
@@ -89,13 +83,7 @@ export function KpiLineChart({ data, color, unit }: KpiLineChartProps) {
           axisLine={false}
           interval="preserveStartEnd"
         />
-        <YAxis
-          tick={{ fontSize: 9, fill: "var(--foreground)" }}
-          tickLine={false}
-          axisLine={false}
-          tickFormatter={(v: number) => formatAxisTick(v, unit)}
-          width={44}
-        />
+        <YAxis hide />
         <Tooltip
           content={<CustomTooltip unit={unit} />}
           cursor={{ stroke: "rgba(128,128,128,0.2)", strokeWidth: 1 }}
