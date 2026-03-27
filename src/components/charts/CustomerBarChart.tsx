@@ -14,7 +14,8 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { useChartDownload } from "@/hooks/useChartDownload";
 import { CUSTOMER_COLORS } from "@/lib/constants";
 import {
-  CHART_HEIGHT,
+  CHART_ASPECT,
+  CHART_MIN_HEIGHT,
   BAR_CHART_MARGIN,
   AXIS_TICK_STYLE,
   BAR_CATEGORY_GAP,
@@ -161,7 +162,7 @@ export function CustomerBarChart({ data, metric, mode, title }: CustomerBarChart
         </div>
       </CardHeader>
       <CardContent className="pb-4 px-2 pt-1">
-        <ResponsiveContainer width="100%" height={CHART_HEIGHT}>
+        <ResponsiveContainer width="100%" aspect={CHART_ASPECT} minHeight={CHART_MIN_HEIGHT}>
           <BarChart data={pivotData} margin={BAR_CHART_MARGIN} barCategoryGap={BAR_CATEGORY_GAP}>
             <XAxis
               dataKey="monthLabel"

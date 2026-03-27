@@ -3,7 +3,10 @@
  * Import from here in every chart component — one change updates everything.
  */
 
-export const CHART_HEIGHT = 190;
+/** width ÷ height ratio — maintained as the card resizes */
+export const CHART_ASPECT = 2.5;
+/** Minimum chart height so it doesn't get too short on narrow screens */
+export const CHART_MIN_HEIGHT = 150;
 
 export const CHART_MARGIN = {
   top: 30,

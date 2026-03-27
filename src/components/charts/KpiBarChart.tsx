@@ -11,7 +11,8 @@ import {
   LabelList,
 } from "recharts";
 import {
-  CHART_HEIGHT,
+  CHART_ASPECT,
+  CHART_MIN_HEIGHT,
   BAR_CHART_MARGIN,
   LABEL_STYLE,
   AXIS_TICK_STYLE,
@@ -59,7 +60,7 @@ export function KpiBarChart({ data, color, unit }: KpiBarChartProps) {
   const formatted = data.map((d) => ({ ...d, monthLabel: formatMonthLabel(d.month) }));
 
   return (
-    <ResponsiveContainer width="100%" height={CHART_HEIGHT}>
+    <ResponsiveContainer width="100%" aspect={CHART_ASPECT} minHeight={CHART_MIN_HEIGHT}>
       <BarChart data={formatted} margin={BAR_CHART_MARGIN} barCategoryGap={BAR_CATEGORY_GAP}>
         <XAxis
           dataKey="monthLabel"
