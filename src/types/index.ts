@@ -16,6 +16,10 @@ export interface MonthlyRow {
   accountsReceivable?: number;     // $M
   accountsPayable?: number;        // $M
   inventory?: number;              // $M
+
+  // Operating costs
+  opex?: number;     // $M — fixed operating expenses excl. commissions
+  payroll?: number;  // $M — payroll costs (subset of opex, used for payroll % of revenue)
 }
 
 export interface KpiMetric {

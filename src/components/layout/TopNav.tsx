@@ -3,7 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard } from "lucide-react";
+import { LayoutDashboard, TrendingUp } from "lucide-react";
 import { APP_NAME } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "./ThemeToggle";
@@ -14,10 +14,10 @@ import { ThemeToggle } from "./ThemeToggle";
 //   import { BarChart2 }  from "lucide-react"  →  Margin Bridge
 //   import { TrendingUp } from "lucide-react"  →  Forecast
 const NAV_ITEMS = [
-  { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+  { label: "KPI Dashboard",       href: "/dashboard", icon: LayoutDashboard },
+  { label: "Revenue Breakdown",   href: "/revenue",   icon: TrendingUp      },
   // { label: "Margin Bridge", href: "/margin-bridge", icon: BarChart2   },
   // { label: "Forecast",      href: "/forecast",      icon: TrendingUp  },
-  // { label: "Settings",      href: "/settings",      icon: Settings    },
 ] as const;
 // ──────────────────────────────────────────────────────────────────────────
 

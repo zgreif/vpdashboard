@@ -4,12 +4,14 @@ export const APP_NAME = "viaPhoton";
 
 export const CHART_COLORS = {
   // Income Statement
-  salesOrders:  "#378ADD",
-  revenue:      "#1D9E75",
-  grossProfit:  "#7F77DD",
-  ebitda:       "#BA7517",
-  grossMargin:  "#7F77DD",
-  ebitdaMargin: "#BA7517",
+  salesOrders:    "#378ADD",
+  revenue:        "#1D9E75",
+  grossProfit:    "#7F77DD",
+  ebitda:         "#BA7517",
+  grossMargin:    "#7F77DD",
+  ebitdaMargin:   "#BA7517",
+  opex:           "#EF4444",
+  payrollPercent: "#A855F7",
   // Cash Flow
   freeCashFlow:          "#0D9488",
   operatingFreeCashFlow: "#F97316",
@@ -119,6 +121,28 @@ export const METRIC_CONFIG: MetricConfig[] = [
     chartType: "line",
     calcType: "margin",
     numeratorKey: "ebitda",
+    denominatorKey: "revenue",
+  },
+
+  {
+    id: "opex",
+    title: "OpEx (excl. Commissions)",
+    tab: "income",
+    color: CHART_COLORS.opex,
+    unit: "currency",
+    chartType: "bar",
+    calcType: "sum",
+    key: "opex",
+  },
+  {
+    id: "payrollPercent",
+    title: "Payroll % of Revenue",
+    tab: "income",
+    color: CHART_COLORS.payrollPercent,
+    unit: "percent",
+    chartType: "line",
+    calcType: "margin",
+    numeratorKey: "payroll",
     denominatorKey: "revenue",
   },
 
